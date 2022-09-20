@@ -13,6 +13,9 @@ import redirectToAuth from "./helpers/redirect-to-auth.js";
 import { BillingInterval } from "./helpers/ensure-billing.js";
 import { AppInstallations } from "./app_installations.js";
 
+
+const fetch = import('node-fetch');
+
 const USE_ONLINE_TOKENS = false;
 
 const PORT = parseInt(process.env.BACKEND_PORT || process.env.PORT, 10);
@@ -58,7 +61,7 @@ const BILLING_SETTINGS = {
 // the code when you store customer data.
 //
 // More details can be found on shopify.dev:
-// https://shopify.dev/apps/webhooks/configuration/mandatory-webhooks
+// 
 setupGDPRWebHooks("/api/webhooks");
 
 // export for test use only
@@ -133,7 +136,7 @@ export async function createServer(
     res.status(status).send({ success: status === 200, error });
   });
 
-  app.get("/generate", async (req, res) => {
+  app.get("/api/generate", async (req, res) => {
     const session = await Shopify.Utils.loadCurrentSession(
       req,
       res,
@@ -144,6 +147,11 @@ export async function createServer(
 
     try {
       console.log("fetching okay")
+      // const productResponse = await fetch('https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=skirt&format=json');
+      // const productData = await productResponse.json();
+      // console.log(productData);
+      // return productData;
+      
     } catch (e) {
       console.log(`Failed to process products/create: ${e.message}`);
       status = 500;

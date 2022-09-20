@@ -16,6 +16,7 @@ export default function HomePage() {
       
       <Layout>
         <Layout.Section>
+          <ProductsCard />
           <CreateProductForm />
         </Layout.Section>
         

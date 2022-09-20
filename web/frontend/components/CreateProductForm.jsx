@@ -8,7 +8,9 @@ import {
     Button,
     Card,
 } from "@shopify/polaris";
+import { authenticatedFetch } from "@shopify/app-bridge-utils";
 import { setProperties } from "@shopify/app-bridge/actions/Cart";
+import { useAppBridge } from "@shopify/app-bridge-react";
 
 export function CreateProductForm() {
     const [products, setProducts] = useState([]);
@@ -23,25 +25,24 @@ export function CreateProductForm() {
         [],
     )
 
+    const app = useAppBridge();
+    const useFetch = authenticatedFetch(app);
 
-    const handleSubmit = async() => {
-        const getProductResponse = await fetch(`/generate`);
-
-        if (getProductResponse.ok) {
-            setTestText("fetching is good");
-            console.log(testText);
-        } else {
-            setTestText("fetching no bueno");
-            console.log(testText);
-        }
-
-        console.log(`submitted ${productTitle}`);
-
-    }
-
-
-    return (
+    const handleSubmit = useCallback((e) => {
+        e.preventDefault();
+        useFetch("/api/generate");
         
+        // const getProductResponse = await fetch(`/api/generate`);
+
+        // if (getProductResponse.ok) {
+        //     console.log(getProductResponse);
+        // } else {
+        //     console.log("err");
+        // }
+        console.log("hello there");
+    }, []);
+
+    return (   
             <Form onSubmit={handleSubmit}>
                 <Card sectioned>
                     <FormLayout>
@@ -55,7 +56,6 @@ export function CreateProductForm() {
                         <Button submit>Submit</Button>
                     </FormLayout>
                 </Card>
-            </Form>
-        
+            </Form>  
     );
 }
