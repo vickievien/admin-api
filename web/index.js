@@ -14,7 +14,7 @@ import { BillingInterval } from "./helpers/ensure-billing.js";
 import { AppInstallations } from "./app_installations.js";
 
 
-const fetch = import('node-fetch');
+import fetch from 'node-fetch';
 
 const USE_ONLINE_TOKENS = false;
 
@@ -147,10 +147,11 @@ export async function createServer(
 
     try {
       console.log("fetching okay")
-      // const productResponse = await fetch('https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=skirt&format=json');
-      // const productData = await productResponse.json();
-      // console.log(productData);
-      // return productData;
+      const productResponse = await fetch('https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=skirt&format=json');
+      const productData = await productResponse.json();
+      console.log(productData);
+      console.log(productData.query.search[0].title);
+      console.log(productData.query.search[0].snippet);
       
     } catch (e) {
       console.log(`Failed to process products/create: ${e.message}`);
