@@ -13,9 +13,6 @@ import redirectToAuth from "./helpers/redirect-to-auth.js";
 import { BillingInterval } from "./helpers/ensure-billing.js";
 import { AppInstallations } from "./app_installations.js";
 
-
-import fetch from 'node-fetch';
-
 const USE_ONLINE_TOKENS = false;
 
 const PORT = parseInt(process.env.BACKEND_PORT || process.env.PORT, 10);
@@ -61,7 +58,7 @@ const BILLING_SETTINGS = {
 // the code when you store customer data.
 //
 // More details can be found on shopify.dev:
-// 
+// https://shopify.dev/apps/webhooks/configuration/mandatory-webhooks
 setupGDPRWebHooks("/api/webhooks");
 
 // export for test use only
@@ -136,31 +133,6 @@ export async function createServer(
     res.status(status).send({ success: status === 200, error });
   });
 
-  app.get("/api/generate", async (req, res) => {
-    const session = await Shopify.Utils.loadCurrentSession(
-      req,
-      res,
-      app.get("use-online-tokens")
-    );
-    let status = 200;
-    let error = null;
-
-    try {
-      console.log("fetching okay")
-      const productResponse = await fetch('https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=skirt&format=json');
-      const productData = await productResponse.json();
-      console.log(productData);
-      console.log(productData.query.search[0].title);
-      console.log(productData.query.search[0].snippet);
-      
-    } catch (e) {
-      console.log(`Failed to process products/create: ${e.message}`);
-      status = 500;
-      error = e.message;
-    }
-    res.status(status).send({ success: status === 200, error });
-  });
-
   // All endpoints after this point will have access to a request.body
   // attribute, as a result of the express.json() middleware
   app.use(express.json());
@@ -192,7 +164,6 @@ export async function createServer(
   }
 
   app.use("/*", async (req, res, next) => {
-
     if (typeof req.query.shop !== "string") {
       res.status(500);
       return res.send("No shop provided");
@@ -201,7 +172,7 @@ export async function createServer(
     const shop = Shopify.Utils.sanitizeShop(req.query.shop);
     const appInstalled = await AppInstallations.includes(shop);
 
-    if (!appInstalled) {
+    if (!appInstalled && !req.originalUrl.match(/^\/exitiframe/i)) {
       return redirectToAuth(req, res, app);
     }
 
